@@ -42,3 +42,46 @@ def getBook(request,pk):
     serializer = BookSerializer(book)
 
     return Response(serializer.data)
+
+@api_view(['POST'])
+def createBook(request):
+    serializer = BookSerializer(data=request.data)
+    if serializer.is_valid():
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE','PUT'])
+def updateAuthor(request,pk):
+    try:
+        author = Author.objects.get(pk=pk)
+        if request.method == 'DELETE':
+            author.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if request.method == 'PUT':
+            serializer = AuthorSerializer(author,data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE','PUT'])
+def updateBook(request,pk):
+    book = Book.objects.get(pk=pk)
+    if request.method == 'DELETE':
+        book.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    if request.method == 'PUT':
+        serializer = BookSerializer(book,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
